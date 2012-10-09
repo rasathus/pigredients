@@ -17,10 +17,10 @@ We are hoping to go beyond this, and provide robust implementations for a divers
 We have layed out the repository in the following structure ...
 
     .
-    ... ics               # Contains all the Integrate Circuit modules.
-    ... displays          # Contains all the Display driving modules.
-    ... sensors           # Contains all our sensing modules.
-    ... examples          # Example implementations for all modules.
+    ├── ics           # Contains all the Integrate Circuit modules.
+    ├── displays      # Contains all the Display driving modules.
+    ├── sensors       # Contains all our sensing modules.
+    └── examples      # Example implementations for all modules.
 
 Its still early days, and we've yet to evaluate our packaging options.  Currently you have two options ...
 
