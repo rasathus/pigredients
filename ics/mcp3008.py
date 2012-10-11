@@ -3,7 +3,7 @@ Authors: Jeremy Blythe, Chris Fane
 
 Original mcp3008 implementation completed by Jeremy Blythe.  Modularisation, extension for named pins and alternate bus addresses by Chris Fane
 
-This module implements support for use the TextStar Serial LCD display in TTL mode form the Raspberry Pi.  Supporting 16*2 charactor output and the builtin bar graph functionality.  For usage information please consult the examples distributed with this package.
+This module implements support for the mcp3008 10bit Analogue to Digital convertor, allowing an analogue signal attached to one of the eight input pins to be translated into a corresponding value of between 0 and 1023.  For usage information please consult the examples distributed with this package.
 '''
 
 import sys
