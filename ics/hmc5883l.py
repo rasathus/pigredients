@@ -4,30 +4,19 @@ import smbus
 
 from Adafruit_I2C import Adafruit_I2C
 
-i2c_address = 0x1e
-write_reg = 0x3c
-read_reg = 0x3d
-
-# < Arduino Vars > 
-HMC5883L_Address = 0x1E
-ConfigurationRegisterA = 0x00
-ConfigurationRegisterB = 0x01
-ModeRegister = 0x02
-DataRegisterBegin = 0x03
-
-# </Arduino Vars >
-
+_hmc5883l_address = 0x1e
 _mode_register = 0x02
 _mode_map = {    'continuous' : 0x00,
                 'single' : 0x01,
                 'idle' : 0x03}
+_configuration_reg_a = 0x00
 _configuration_reg_b = 0x01
-
+_read_register = 0x03
 
 
 class HMC5883L(object):
     
-    def __init__(self, i2c_bus=0, i2c_address=0x1e, debug=False):
+    def __init__(self, i2c_bus=0, i2c_address=_hmc5883l_address, debug=False):
                 
         self.debug = debug
         self.gauss = 0.88
@@ -49,7 +38,7 @@ class HMC5883L(object):
     def get_value(self):
         result = { 'x' : None, 'y' : None, 'z' : None }
         # clear the buffer
-        read_buffer = self.i2c.readList(DataRegisterBegin, 6)
+        read_buffer = self.i2c.readList(_read_register, 6)
         
         result['x'] = round(((read_buffer[0] << 8) | read_buffer[1]) * self._multiplication_factor , 3)
         result['z'] = round(((read_buffer[2] << 8) | read_buffer[3]) * self._multiplication_factor , 3)
