@@ -17,18 +17,21 @@ We are hoping to go beyond this, and provide robust implementations for a divers
 We have layed out the repository in the following structure ...
 
     .
-    ├── ics           # Contains all the Integrate Circuit modules.
-    ├── displays      # Contains all the Display driving modules.
-    ├── sensors       # Contains all our sensing modules.
-    └── examples      # Example implementations for all modules.
+    ├── examples      # Example implementations for all modules.
+    ├── setup.py      
+    └── pigredients   
+        ├── ics       # Contains all the Integrate Circuit modules.
+        ├── displays  # Contains all the Display driving modules.
+        └── sensors   # Contains all our sensing modules.
 
-Its still early days, and we've yet to evaluate our packaging options.  Currently you have two options ...
+        
+To install pigredients for use in other projects, simply run the following command.  Depending on your environment you may not require the sudo prefix to this command.
 
-* clone the repository into an folder, and create a softlink to allow its import into your python environment. eg. 'sudo ln -s ~/src/pigredients/ /usr/lib/python2.7/dist-packages/pigredients'
-* clone the repository directly into your python dist-packages path. like so ... 'git clone https://github.com/rasathus/pigredients.git /usr/lib/python2.7/dist-packages/pigredients'
-
+    sudo python setup.py install
+    
 ## Naming Convention Notes
 
 Please note that due to some component identifiers starting with numbers eg. 74HC595, some modules are prefixed with a relevant prefix, 'ic' for integrated circuits, 'sen' for sensors, 'disp' for displays etc..  This aleviates issues with imports, and allows the use of all standard conventions when importing modules.
 
-
+## License
+Pigredients is released under the MIT License. - http://www.opensource.org/licenses/MIT
