@@ -28,6 +28,8 @@ We have layed out the repository in the following structure ...
 To install pigredients for use in other projects, simply run the following command.  Depending on your environment you may not require the sudo prefix to this command.
 
     sudo python setup.py install
+
+Additionally some modules require the Adafruit I2C module, which can be found here ... https://github.com/adafruit/Adafruit-Raspberry-Pi-Python-Code
     
 ## Naming Convention Notes
 
