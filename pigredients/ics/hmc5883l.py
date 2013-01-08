@@ -1,24 +1,25 @@
 import sys
 
 import smbus
+import math
 
 from Adafruit_I2C import Adafruit_I2C
 
 _hmc5883l_address = 0x1e
 _mode_register = 0x02
-_mode_map = {    'continuous' : 0x00,
+_mode_map = {   'continuous' : 0x00,
                 'single' : 0x01,
                 'idle' : 0x03}
 _configuration_reg_a = 0x00
 _configuration_reg_b = 0x01
 _read_register = 0x03
 
-
 class HMC5883L(object):
     
-    def __init__(self, i2c_bus=0, i2c_address=_hmc5883l_address, debug=False):
+    def __init__(self, i2c_bus=0, i2c_address=_hmc5883l_address, debug=False, declination_angle=0.0457):
                 
         self.debug = debug
+        self.declination_angle = declination_angle
         self.gauss = 0.88
         self.scale = 0x00
         self._multiplication_factor = 0.73
@@ -34,17 +35,27 @@ class HMC5883L(object):
             self.i2c.write8(_mode_register, _mode_map[mode.lower()])
         else:
             raise Exception('Invalid mode requested, valid modes are continuous, single and idle.')
-        
-    def get_value(self):
+
+    def get_raw(self):
         result = { 'x' : None, 'y' : None, 'z' : None }
         # clear the buffer
         read_buffer = self.i2c.readList(_read_register, 6)
         
-        result['x'] = round(((read_buffer[0] << 8) | read_buffer[1]) * self._multiplication_factor , 3)
-        result['z'] = round(((read_buffer[2] << 8) | read_buffer[3]) * self._multiplication_factor , 3)
-        result['y'] = round(((read_buffer[4] << 8) | read_buffer[5]) * self._multiplication_factor , 3)
+        result['x'] = (read_buffer[0] << 8) | read_buffer[1]
+        result['z'] = (read_buffer[2] << 8) | read_buffer[3]
+        result['y'] = (read_buffer[4] << 8) | read_buffer[5]
         
         self.last_result = result
+        return result
+
+
+    def get_value(self):
+        result = self.get_raw()
+        
+        result['x'] = result['x'] * self._multiplication_factor
+        result['z'] = result['z'] * self._multiplication_factor
+        result['y'] = result['y'] * self._multiplication_factor
+        
         return result
 
     def set_scale(self, gauss):
@@ -83,9 +94,34 @@ class HMC5883L(object):
         else:
             raise Exception("Invalid gauss value, valid gauss values are 0.88, 1.3, 1.9, 2.5, 4.0, 4.7, 5.6 or 8.1")
 
-    	# Setting is in the top 3 bits of the register.
-    	self.scale = self.scale << 5
+        # Setting is in the top 3 bits of the register.
+        self.scale = self.scale << 5
         self.i2c.write8(_configuration_reg_b, self.scale)
         
     def get_scale(self):
         return self.scale
+            
+    def get_heading(self):
+        scaled_data = self.get_value()
+        heading = math.atan2(scaled_data['y'], scaled_data['x'])
+        print "--Begining of Reading--"
+        print "Heading pre correction : %f" % heading
+        print "Heading Degrees pre correction : %f" % math.degrees(heading)
+        
+        heading += self.declination_angle;
+
+
+
+
+        print "Pre-corrected heading %s" % heading
+        if heading < 0 :
+            heading = heading + 2 * math.pi
+        elif heading > 2 * math.pi:
+            heading = heading - 2 * math.pi
+
+        print "X Value : %f" % scaled_data['x']
+        print "Y Value : %f" % scaled_data['y']        
+        print "Radians : %f" % heading
+        print "Degrees : %f" % math.degrees(heading)
+        print "--End of Reading--"
+        return math.degrees(heading)
