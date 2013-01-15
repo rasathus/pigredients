@@ -11,5 +11,6 @@ def write_direction():
     
 while True:
     write_direction()
+    print "Die Temp : %d" % compass.get_temp() 
     sleep(0.5)          
         

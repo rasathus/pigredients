@@ -13,6 +13,9 @@ _sysmod_register = 0x08
 
 _die_temp_register = 0x0F
 
+_ctrl_register1_value = 0x01
+_ctrl_register2_value = 0x80
+
 # For opperation modes refer to table 31 of the freescale datasheet.
 # operation modes are based on '10101' - output rate @ 1.25hz with 32 times oversampling and 34.4 ua current draw.
 _operation_modes = {'continuous' : 170, # 
@@ -35,11 +38,18 @@ class MAG3110(object):
         self.i2c = Adafruit_I2C(i2c_address, bus=self._bus, debug=self.debug)
 
         # enable autoreset mode, not quite sure why but the arduino implementations do it.
-        self.i2c.write8(_ctrl_register2, 0x80)
+        self.i2c.write8(_ctrl_register2, _ctrl_register2_value)
         time.sleep(0.015)
-        self.i2c.write8(_ctrl_register1, 0x01)
+        current_register_contents = self.i2c.readU8(_ctrl_register2)
+        if current_register_contents != _ctrl_register2_value:
+            print "WARNING : Register contents mismatch !!"
+
+        self.i2c.write8(_ctrl_register1, _ctrl_register1_value)
         time.sleep(0.015)
-        
+        current_register_contents = self.i2c.readU8(_ctrl_register1)
+        if current_register_contents != _ctrl_register1_value:
+            print "WARNING : Register contents mismatch !!"
+
         # set device to standby mode, before setting control registers.
         #current_sysmod = self.get_mode()
         
@@ -51,9 +61,12 @@ class MAG3110(object):
 
     def get_mode(self):
         # will use later to abstract the complexities of table 31 from the user.
-        self.i2c.read8(_sysmod_register)
+        self.i2c.readU8(_sysmod_register)
         return None
         
+    def get_temp(self):
+        return self.i2c.readS8(_die_temp_register)
+
     def set_mode(self, mode):
         # will use later to abstract the complexities of table 31 from the user.
         if mode.lower() in _mode_map:
