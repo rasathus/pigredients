@@ -73,7 +73,7 @@ class PIXI200(object):
             int(led_mode)
             # not sure if this will work, as a 4bit register.
             response = self.spi.xfer2([_leds_config_register, 0x40, led_mode, 0])
-            print "led set mode got the response : %s" % response
+            #print "led set mode got the response : %s" % response
         except TypeError:
             raise Exception('Invalid led mode requested, valid modes are 0000, 0001, 0010, 0011 etc.')
         
@@ -91,11 +91,19 @@ class PIXI200(object):
             raise Exception("Invalid led state given, valid led states are : %s " % _valid_led_state)
         self._led_state[led_id] = _valid_led_state[state]
 
+    def set_on(self):
+        for led_id in self._led_state:
+            self._led_state[led_id] = _valid_led_state['on']
+
+    def set_off(self):
+        for led_id in self._led_state:
+            self._led_state[led_id] = _valid_led_state['off']
+
     def update_leds(self):
         # flush the current led set states to the register.
         data_list = [_leds_out_register,0x40]
         temp_string = ""
-        for led in reversed(_valid_led_ids):
+        for led in _valid_led_ids:
             #print "Processing led : %s" % led
             temp_string = "%s%s" % (temp_string, self._led_state[led])
             #print "temp_string : %s " % temp_string
@@ -104,7 +112,7 @@ class PIXI200(object):
                 data_list.append(int(temp_string, 2))
                 temp_string = ""
 
-        print "data list contains : %s" % data_list
+        #print "data list contains : %s" % data_list
         response = self.spi.xfer2(data_list)
-        print "led set got the response : %s" % response
+        #print "led set got the response : %s" % response
         
