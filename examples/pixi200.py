@@ -96,7 +96,11 @@ def vis_accel():
 		pixi.set_off()
 		pixi.update_leds()
 
-while True:
-    vis_accel()
-    #sleep(0.25)
+try:
+	while True:
+		vis_accel()
+		#sleep(0.25)
+except (KeyboardInterrupt, SystemExit):
+	pixi.set_off()
+	pixi.update_leds()
 
