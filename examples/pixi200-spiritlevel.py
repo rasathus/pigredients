@@ -1,11 +1,8 @@
 from time import sleep
 from pigredients.boards import pixi200 as pixi200
 
-# should probably load these components as part of the pixi-200 module.
-from pigredients.ics import mma7660 as mma7660
 
-pixi = pixi200.PIXI200()
-accel = mma7660.MMA7660(i2c_bus=1, debug=False)
+pixi = pixi200.PIXI200(i2c_bus=1)
 
 """
 for i in range(0,10):
@@ -48,7 +45,7 @@ pixi.update_leds()
 
 # a fun little spirit level using the leds to visualise the accelerometer data.
 def vis_accel():
-	current_state = accel.get_value()
+	current_state = pixi.accel.get_value()
 	#print "Current Accel Vals : %s" % current_state
 	if current_state['y'] > 39 and current_state['y'] <= 45:
 		pixi.set_off()

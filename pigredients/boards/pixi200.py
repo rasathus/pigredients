@@ -4,6 +4,9 @@ import smbus
 import spidev
 from Adafruit_I2C import Adafruit_I2C
 
+from pigredients.ics import mma7660 as mma7660
+from pigredients.ics import mag3110 as mag3110
+
 _pixi_i2c_address = 0x70
 
 _leds_out_register = 0x30 # 16bits, 2bits per led. 00 = off, 01 = slow blink, 10 = fast blink, 11 = on
@@ -33,9 +36,14 @@ class PIXI200(object):
         self.spi = spidev.SpiDev()
         self.spi.open(spi_address_hardware, spi_address_output)
         # setup i2c comms
-        self._bus = smbus.SMBus(i2c_bus)
+        self.i2c_bus = i2c_bus
+        self._bus = smbus.SMBus(self.i2c_bus)
+        # i2c bus for comms with the fpga
         self.i2c = Adafruit_I2C(i2c_address, bus=self._bus, debug=self.debug)
-        
+        # setup for accelerometers and magnatometers
+        self.accel = mma7660.MMA7660(i2c_bus=self.i2c_bus, debug=self.debug)
+        self.compass = mag3110.MAG3110(i2c_bus=self.i2c_bus, debug=self.debug)
+
         self._led_state = {}
         for led in _valid_led_ids:
             self._led_state[led] = 00        
