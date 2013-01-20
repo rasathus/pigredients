@@ -62,9 +62,10 @@ class PIXI200(object):
     
     def _spi_read(self, register_address):
         response = response_object()
-        addresses_list = [register_address, 0x80]
+        # two bytes of zereos to request two bytes of data back.
+        addresses_list = [register_address, 0x80, 0x00, 0x00]
         response.response = self.spi.xfer2(addresses_list)
-        if response.response[0] == 0x32:
+        if response.response[0] == register_address:
             response.success = True
         return response
     
@@ -74,6 +75,22 @@ class PIXI200(object):
     
     def _i2c_read(self, register_address):
         return None
+
+    def get_switch(self):
+        switch_state = {'s1' : {'now' : None, 'pressed' : None}, 's2' : {'now' : None, 'pressed' : None}, 's3' : {'now' : None, 'pressed' : None}, 's4' : {'now' : None, 'pressed' : None}}
+        read_buffer = bin(self._spi_read(_switch_in_register).response[3])[2:].zfill(8)
+        switch_state['s1']['now'] = bool(int(read_buffer[7]))
+        switch_state['s1']['pressed'] = bool(int(read_buffer[6]))
+        switch_state['s2']['now'] = bool(int(read_buffer[5]))
+        switch_state['s2']['pressed'] = bool(int(read_buffer[4]))
+        switch_state['s3']['now'] = bool(int(read_buffer[3]))
+        switch_state['s3']['pressed'] = bool(int(read_buffer[2]))
+        switch_state['s4']['now'] = bool(int(read_buffer[1]))
+        switch_state['s4']['pressed'] = bool(int(read_buffer[0]))
+        return switch_state
+
+    def get_buttons(self):
+        return self.get_switch()
         
     def set_led_mode(self, led_mode):
         try :
@@ -84,13 +101,6 @@ class PIXI200(object):
             #print "led set mode got the response : %s" % response
         except TypeError:
             raise Exception('Invalid led mode requested, valid modes are 0000, 0001, 0010, 0011 etc.')
-        
-
-    def get_buttons(self):
-        read_buffer = self.spi.xfer2([_switch_in_register,0x80,0,0])
-        print "Got read Buffer : %s" % read_buffer
-
-        return None
 
     def set_led(self, led_id, state):
         if led_id not in _valid_led_ids:
