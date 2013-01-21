@@ -80,8 +80,6 @@ class MAG3110(object):
         # Read 6 bytes in the form of x-MSB, x-LSB, y-MSB, y-LSB, z-MSB, z-LSB
         read_buffer = self.i2c.readList(_first_read_register, 6)
         
-        print "got a read buffer of : %s " % read_buffer
-        
         result['x'] = (read_buffer[0] << 8) | read_buffer[1]
         result['y'] = (read_buffer[2] << 8) | read_buffer[3]
         result['z'] = (read_buffer[4] << 8) | read_buffer[5]
