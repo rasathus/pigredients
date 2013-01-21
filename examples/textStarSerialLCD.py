@@ -2,6 +2,8 @@
 # - * - Coding: utf-8 - * -
 
 import random
+import datetime
+import subprocess
 
 from time import sleep
 from pigredients.displays import textStarSerialLCD as textStarSerialLCD
