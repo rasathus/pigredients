@@ -30,7 +30,9 @@ To install pigredients for use in other projects, simply run the following comma
     sudo python setup.py install
 
 Additionally some modules require the Adafruit I2C module, which can be found here ... https://github.com/adafruit/Adafruit-Raspberry-Pi-Python-Code
-    
+
+And others will require py-spidev, which is available here ... https://github.com/doceme/py-spidev
+
 ## Naming Convention Notes
 
 Please note that due to some component identifiers starting with numbers eg. 74HC595, some modules are prefixed with a relevant prefix, 'ic' for integrated circuits, 'sen' for sensors, 'disp' for displays etc..  This aleviates issues with imports, and allows the use of all standard conventions when importing modules.
