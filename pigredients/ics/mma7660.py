@@ -26,12 +26,15 @@ mode_configuration_active = 0x19 # 00011001
 
 
 class MMA7660(object):
-    def __init__(self, i2c_bus=0, i2c_address=_mma7660_address, debug=False):
+    def __init__(self, i2c_bus=None, i2c_address=_mma7660_address, debug=False):
             
         self.debug = debug
         # Create our i2c connection
-        self._bus = smbus.SMBus(i2c_bus) 
-        self.i2c = Adafruit_I2C(i2c_address, bus=self._bus, debug=self.debug)
+        if i2c_bus is None:
+            self.i2c = Adafruit_I2C(i2c_address, debug=self.debug)
+        else:
+            self._bus = smbus.SMBus(i2c_bus) 
+            self.i2c = Adafruit_I2C(i2c_address, bus=self._bus, debug=self.debug)
         
         # set our interupt configuration.
         self.set_register(_interupt_register, interupt_configuration)

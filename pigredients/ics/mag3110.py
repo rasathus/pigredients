@@ -25,17 +25,24 @@ _get_mode_map = {0: 'Standby', 1 : 'ActiveRaw', 2 : 'ActiveCorrected'}
 # it sounds as if the pointer moves for you after each byte read, so should be able to read 6 bytes starting at this register.
 _first_read_register = 0x01
 
+def fix_msb(val):
+    if val >= 32768:
+        val -= 65536
+    return val
 
 class MAG3110(object):
     
-    def __init__(self, i2c_bus=0, i2c_address=_mag3110_address, declination_angle=0.0457, debug=False):
+    def __init__(self, i2c_bus=None, i2c_address=_mag3110_address, declination_angle=0.0457, debug=False):
             
         self.debug = debug
         self.last_result = None
         self.declination_angle = declination_angle
         # Create our i2c connection
-        self._bus = smbus.SMBus(i2c_bus) 
-        self.i2c = Adafruit_I2C(i2c_address, bus=self._bus, debug=self.debug)
+        if i2c_bus is None:
+            self.i2c = Adafruit_I2C(i2c_address, debug=self.debug)
+        else:
+            self._bus = smbus.SMBus(i2c_bus) 
+            self.i2c = Adafruit_I2C(i2c_address, bus=self._bus, debug=self.debug)
 
         # enable autoreset mode, not quite sure why but the arduino implementations do it.
         self.i2c.write8(_ctrl_register2, _ctrl_register2_value)
@@ -43,12 +50,26 @@ class MAG3110(object):
         current_register_contents = self.i2c.readU8(_ctrl_register2)
         if current_register_contents != _ctrl_register2_value:
             print "WARNING : Register contents mismatch !!"
+        """
+        while current_register_contents != _ctrl_register2_value:
+            print "WARNING : Register contents mismatch !!"
+            self.i2c.write8(_ctrl_register2, _ctrl_register2_value)
+            time.sleep(0.015)
+        """
 
         self.i2c.write8(_ctrl_register1, _ctrl_register1_value)
         time.sleep(0.015)
         current_register_contents = self.i2c.readU8(_ctrl_register1)
         if current_register_contents != _ctrl_register1_value:
             print "WARNING : Register contents mismatch !!"
+        """
+        while current_register_contents != _ctrl_register1_value:
+            print "WARNING : Register contents mismatch !!"
+            self.i2c.write8(_ctrl_register1, _ctrl_register1_value)
+            time.sleep(0.015)
+        """
+
+
 
         # set device to standby mode, before setting control registers.
         #current_sysmod = self.get_mode()
@@ -80,9 +101,9 @@ class MAG3110(object):
         # Read 6 bytes in the form of x-MSB, x-LSB, y-MSB, y-LSB, z-MSB, z-LSB
         read_buffer = self.i2c.readList(_first_read_register, 6)
         
-        result['x'] = (read_buffer[0] << 8) | read_buffer[1]
-        result['y'] = (read_buffer[2] << 8) | read_buffer[3]
-        result['z'] = (read_buffer[4] << 8) | read_buffer[5]
+        result['x'] = fix_msb((read_buffer[0] << 8) | read_buffer[1])
+        result['y'] = fix_msb((read_buffer[2] << 8) | read_buffer[3])
+        result['z'] = fix_msb((read_buffer[4] << 8) | read_buffer[5])
         
         self.last_result = result
         return result
