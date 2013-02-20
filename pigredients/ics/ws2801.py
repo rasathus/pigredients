@@ -14,7 +14,7 @@ class WS2801_Chain(object):
         self.ics = {}
         
         for ic in range(self.number_of_ics):
-            self.ics[ic] = { 'R' : 0 , 'G' : 0, 'B' : 0, 'lumi' : 0 }
+            self.ics[ic] = { 'R' : 0 , 'G' : 0, 'B' : 0}
         
 		#Write out the current zero'd state to the chain.
         self.write()       
@@ -23,19 +23,10 @@ class WS2801_Chain(object):
         # Iterate through our IC states, and write out 3 bytes for each, representing <Red Byte><Green Byte><Blue Byte>
         byte_list = []
         for ic in self.ics:
-			# Calculate our luminance corrected value per colour, and append it to the output list.
-            try : 
-                byte_list.append(int(round(self.ics[ic]['R'] / 100 * self.ics[ic]['lumi'])))
-            except ZeroDivisionError:
-                byte_list.append(0)
-            try : 
-                byte_list.append(int(round(self.ics[ic]['G'] / 100 * self.ics[ic]['lumi'])))
-            except ZeroDivisionError:
-                byte_list.append(0)
-            try : 
-                byte_list.append(int(round(self.ics[ic]['B'] / 100 * self.ics[ic]['lumi'])))
-            except ZeroDivisionError:
-                byte_list.append(0)
+			# Append our colour bytes to the output list.
+            byte_list.append(int(self.ics[ic]['R']))
+            byte_list.append(int(self.ics[ic]['G']))
+            byte_list.append(int(self.ics[ic]['B']))
         
         self.spi.xfer2(byte_list)
         
@@ -47,8 +38,7 @@ class WS2801_Chain(object):
     def print_ics(self):
         print self.ics
                 
-    def set_ic(self, ic_id, rgb_value=[], lumi=100):
-		# if not given a luminance value, default to 100%
+    def set_ic(self, ic_id, rgb_value=[]):
         # Check we've been given a valid rgb_value.
         if ic_id > self.number_of_ics -1:
             raise Exception("Invalid ic_id : ic_id given is greater than the number number of ics in the chain.")
@@ -59,15 +49,15 @@ class WS2801_Chain(object):
         try:
 			# Null op to ensure we've been given an integer.
             int(ic_id)
-            self.ics[ic_id]= {'R' : rgb_value[0], 'G' : rgb_value[1], 'B' : rgb_value[2], 'lumi' : lumi} 
+            self.ics[ic_id]= {'R' : rgb_value[0], 'G' : rgb_value[1], 'B' : rgb_value[2]}
         except ValueError:
             raise Exception("Pin number is not a valid integer.")    
                     
-    def set_rgb(self, rgb_value, lumi=100):
+    def set_rgb(self, rgb_value):
         if len(rgb_value) != 3:
             raise Exception("Invalid rgb_value: %s, please pass a list containing three state values eg. [255,255,255]" % rgb_value)
         for ic in range(self.number_of_ics):
-             self.ics[ic] = {'R' : rgb_value[0], 'G' : rgb_value[1], 'B' : rgb_value[2], 'lumi' : lumi}
+             self.ics[ic] = {'R' : rgb_value[0], 'G' : rgb_value[1], 'B' : rgb_value[2]}
  
             
     def all_on(self):
@@ -90,25 +80,25 @@ class WS2801_Chain(object):
             byte_list.append(0)
         self.spi.xfer2(byte_list)
         
-    def set_white(self, lumi=100):
+    def set_white(self):
         for ic in range(self.number_of_ics):
-             self.ics[ic] = {'R' : 255, 'G' : 255, 'B' : 255, 'lumi' : lumi}
+             self.ics[ic] = {'R' : 255, 'G' : 255, 'B' : 255}
 
-    def set_red(self, lumi=100):
+    def set_red(self):
         for ic in range(self.number_of_ics):
-             self.ics[ic] = {'R' : 255, 'G' : 0, 'B' : 0, 'lumi' : lumi}
+             self.ics[ic] = {'R' : 255, 'G' : 0, 'B' : 0}
              
-    def set_green(self, lumi=100):
+    def set_green(self):
         for ic in range(self.number_of_ics):
-             self.ics[ic] = {'R' : 0, 'G' : 255, 'B' : 0, 'lumi' : lumi}
+             self.ics[ic] = {'R' : 0, 'G' : 255, 'B' : 0}
                           
-    def set_blue(self, lumi=100):
+    def set_blue(self):
         for ic in range(self.number_of_ics):
-             self.ics[ic] = {'R' : 0, 'G' : 0, 'B' : 255, 'lumi' : lumi}
+             self.ics[ic] = {'R' : 0, 'G' : 0, 'B' : 255}
                      
     def set_off(self):
         for ic in range(self.number_of_ics):
-             self.ics[ic] = {'R' : 0, 'G' : 0, 'B' : 0, 'lumi' : 0}
+             self.ics[ic] = {'R' : 0, 'G' : 0, 'B' : 0}
 
     def all_random(self):
         byte_list =[]
@@ -126,7 +116,6 @@ class WS2801_Chain(object):
             self.ics[ic]['R'] = random.randint(0,255)
             self.ics[ic]['G'] = random.randint(0,255)
             self.ics[ic]['B'] = random.randint(0,255)
-            self.ics[ic]['lumi'] = 100
                     
         for i in range(512):            
             for ic in range(self.number_of_ics):
