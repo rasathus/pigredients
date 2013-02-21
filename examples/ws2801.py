@@ -8,7 +8,7 @@ if __name__ == '__main__':
     led_chain.all_off()
     led_chain.write()
     
-    led_chain.set_ic(ic_id=24, rgb_value=[255,0,255], lumi=50)
+    led_chain.set_ic(ic_id=24, rgb_value=[255,0,255])
     led_chain.write()
     time.sleep(2)
     led_chain.set_ic(ic_id=24, rgb_value=[0,0,0])
