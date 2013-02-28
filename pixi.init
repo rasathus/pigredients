@@ -1,0 +1,47 @@
+#! /bin/sh
+# /etc/init.d/pixi
+#
+
+pixi_path='/home/pixi-200/'
+
+# Carry out specific functions when asked to by the system
+case "$1" in
+  start)
+    echo "Flashing Pixi and Starting Demo ..."
+    # checking for existing instance.
+    cd $pixi_path
+    /bin/bash ${pixi_path}pixi_prog.sh  
+    /usr/bin/python ${pixi_path}/pigredients/examples/pixi200-demo.py > /dev/null 2>&1 &
+    pid=$!
+    echo $pid > /var/run/pixi-demo.pid
+    ;;
+  stop)
+    echo "Stopping Pixi Demo ..."
+    if [ -e /var/run/pixi-demo.pid ]; then
+        /bin/kill -s sigterm $(cat /var/run/pixi-demo.pid)
+        /bin/rm /var/run/pixi-demo.pid
+    fi
+    ;;
+  restart)
+    echo "Restarting Pixi Demo ..."
+    echo "Stopping Pixi Demo ..."
+    if [ -e /var/run/pixi-demo.pid ]; then
+        /bin/kill -s sigterm $(cat /var/run/pixi-demo.pid)
+        /bin/rm /var/run/pixi-demo.pid
+    fi
+    sleep 1
+    echo "Flashing Pixi and Starting Demo ..."
+    # checking for existing instance.
+    cd $pixi_path
+    /bin/bash ${pixi_path}pixi_prog.sh
+    /usr/bin/python ${pixi_path}/pigredients/examples/pixi200-demo.py > /dev/null 2>&1 &
+    pid=$!
+    echo $pid > /var/run/pixi-demo.pid
+    ;;
+  *)
+    echo "Usage: /etc/init.d/pixi {start|stop|restart}"
+    exit 1
+    ;;
+esac
+
+exit 0
