@@ -6,8 +6,8 @@ import random
 		
 class LPD8806_Chain(object):
 	
-    def __init__(self, ics_in_chain=25, spi_address_hardware=0, spi_address_output=0):
-        # default to 25 ics in the chain
+    def __init__(self, ics_in_chain=32, spi_address_hardware=0, spi_address_output=0):
+        # default to 32 ics in the chain, equating to 1 metre
         self.number_of_ics = ics_in_chain
         self.spi = spidev.SpiDev()
         self.spi.open(spi_address_hardware, spi_address_output)
@@ -23,14 +23,17 @@ class LPD8806_Chain(object):
         # Iterate through our IC states, and write out 3 bytes for each, representing <Red Byte><Green Byte><Blue Byte>
         byte_list = []
         for ic in self.ics:
-            # Append our colour bytes to the output list.
-            byte_list.append(int(self.ics[ic]['R']))
-            byte_list.append(int(self.ics[ic]['G']))
-            byte_list.append(int(self.ics[ic]['B']))
-        
+            # Append our colour bytes to the output list. Using order GRB
+            byte_list.append(0x80 | (int(self.ics[ic]['G']) >> 1))
+            byte_list.append(0x80 | (int(self.ics[ic]['R']) >> 1))
+            byte_list.append(0x80 | (int(self.ics[ic]['B']) >> 1))
+        #LPD8806 Chipset requires an extra 0x00 per meter to push things along, according to the Arduino Library from adafruit.
+        for extra in range(self.number_of_ics//32):
+            byte_list.append(0x00)
         self.spi.xfer2(byte_list)
         # Clock in our latch.
-      	self.spi.xfer2([0x00,0x00,0x00,0x00])  
+        self.spi.xfer2([0x00,0x00,0x00])
+
         
     def set(self):
         # Alias of write
