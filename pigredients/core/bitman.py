@@ -13,12 +13,15 @@ class BitSequence(object):
         return(length)
     
     def twos_complement(self):
-        """compute the 2's compliment of int value val
-        Stolen from travc @ http://stackoverflow.com/questions/1604464/twos-complement-in-python """
         val = int(self)
         bits = len(self)
-        if (val & (1<<(bits-1))) != 0:
-            val = val - (1<<bits)
+        
+        try:
+            if self[bits-1] != 0:
+                val = val - (1<<bits)
+        except ValueError:
+            # trying to negative shift zero.
+            pass
         return val
 
     def __getitem__(self, val):
