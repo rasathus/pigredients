@@ -11,7 +11,16 @@ class BitSequence(object):
             temp_val >>= 1
             length += 1
         return(length)
-        
+    
+    def twos_complement(self):
+        """compute the 2's compliment of int value val
+        Stolen from travc @ http://stackoverflow.com/questions/1604464/twos-complement-in-python """
+        val = int(self)
+        bits = len(self)
+        if (val & (1<<(bits-1))) != 0:
+            val = val - (1<<bits)
+        return val
+
     def __getitem__(self, val):
         return int(bin(self.value & (1 << val))[2:][0])
     
@@ -30,7 +39,10 @@ class BitSequence(object):
         
     def __len__(self):
         # work out how many words are needed to represent the value, and return this number of bits as its length
-        return int(self._bitLen() + self.bits_per_word - (self._bitLen() % self.bits_per_word))
+        if (self._bitLen() % self.bits_per_word) == 0 :
+            return int(self._bitLen())
+        else:
+            return int(self._bitLen() + self.bits_per_word - (self._bitLen() % self.bits_per_word))
         
     def __str__(self):
         return "0b%s" % bin(self.value)[2:].zfill(len(self))
@@ -41,6 +53,12 @@ class BitSequence(object):
     def __iter__(self):
         for bit in range(len(self)):
             yield self[bit]
+
+    def __invert__(self):
+        return ~int(self)
+
+    def __abs__(self):
+        return int(self)
 
 
 
