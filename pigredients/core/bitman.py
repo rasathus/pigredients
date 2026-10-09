@@ -68,34 +68,34 @@ class BitSequence(object):
 
 if __name__ == '__main__':
     bitseq = BitSequence(0b0000000010101010)
-    print bitseq
+    print(bitseq)
     bitseq = BitSequence(0b0000100010101010)
-    print bitseq
-    print "First : %d Second : %d" % (bitseq[0], bitseq[1])
+    print(bitseq)
+    print("First : %d Second : %d" % (bitseq[0], bitseq[1]))
     bitseq[0] = 1
     bitseq[1] = 1
-    print "First : %d Second : %d Twentieth : %d" % (bitseq[0], bitseq[1],  bitseq[20])
-    print bitseq
+    print("First : %d Second : %d Twentieth : %d" % (bitseq[0], bitseq[1],  bitseq[20]))
+    print(bitseq)
     bitseq[0] = True
     bitseq[1] = False
     bitseq[5] = None
     bitseq[6] = 1
     bitseq[7] = 1
     bitseq[20] = 1
-    print "First : %d Second : %d" % (bitseq[0], bitseq[1])
-    print bitseq
+    print("First : %d Second : %d" % (bitseq[0], bitseq[1]))
+    print(bitseq)
     
     bitseq1 = BitSequence(0b01)
     bitseq2 = BitSequence(0b10)
     
-    print "Equal : %s" % bitseq1 == bitseq2
-    print "Not Equal : %s" % bitseq1 != bitseq2
-    print "%d Greater than %d : %s" % (bitseq1, bitseq2, bitseq1 > bitseq2)
-    print "%d Less than %d : %s" % (bitseq1, bitseq2, bitseq1 < bitseq2)
+    print("Equal : %s" % bitseq1 == bitseq2)
+    print("Not Equal : %s" % bitseq1 != bitseq2)
+    print("%d Greater than %d : %s" % (bitseq1, bitseq2, int(bitseq1) > int(bitseq2)))
+    print("%d Less than %d : %s" % (bitseq1, bitseq2, int(bitseq1) < int(bitseq2)))
     
-    print "len(sequence) : %d" % len(bitseq)
+    print("len(sequence) : %d" % len(bitseq))
     
-    print "Printing bit sequece ..."
+    print("Printing bit sequece ...")
     for bit in bitseq:
-        print bit
+        print(bit)
     

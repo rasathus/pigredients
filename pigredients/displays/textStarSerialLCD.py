@@ -11,6 +11,15 @@ Read the blog entry at http://jeremyblythe.blogspot.com for more information
 import serial
 from threading import Thread
 
+def _to_bytes(data):
+    """pyserial on Python 3 requires bytes.  The Textstar protocol uses raw
+    8 bit values (eg. chr(254) escape), so str is encoded as latin-1, which
+    maps code points 0-255 one to one onto bytes."""
+    if isinstance(data, str):
+        return data.encode('latin-1')
+    return bytes(data)
+
+
 class Display():
     """ Manages the 16x2 4 button display:
         on_tick called every 0.1 seconds as part of the main loop after the button read
@@ -40,28 +49,28 @@ class Display():
         self._run = True
 
     def position_cursor(self,line,column):
-        self.ser.write(self.char_esc+'P'+chr(line)+chr(column))
+        self.ser.write(_to_bytes(self.char_esc+'P'+chr(line)+chr(column)))
     
     def scroll_down(self):
-        self.ser.write(self.char_esc+'O'+chr(0))
+        self.ser.write(_to_bytes(self.char_esc+'O'+chr(0)))
     
     def window_home(self):
-        self.ser.write(self.char_esc+'G'+chr(1))
+        self.ser.write(_to_bytes(self.char_esc+'G'+chr(1)))
         
     def capped_bar(self, length, percent):
-        self.ser.write(self.char_esc+'b'+chr(length)+chr(percent))
+        self.ser.write(_to_bytes(self.char_esc+'b'+chr(length)+chr(percent)))
         
     def clear(self):
-        self.ser.write(self.char_clear)
+        self.ser.write(_to_bytes(self.char_clear))
 
     def run(self):
         #show initial page
-        self.ser.write('  Starting....  ')
+        self.ser.write(_to_bytes('  Starting....  '))
         if self.on_page != None:
             self.on_page()
         #main loop
         while self._run:
-            key = str(self.ser.read(1))
+            key = self.ser.read(1).decode('latin-1')
             if key != '' and key in 'abcd':
                 self.page = key
                 self.refresh = self.refresh_max
@@ -89,5 +98,5 @@ class Display():
         self.threaded_runner.start()
 
     def stop(self):
-        print "Display stop called"
+        print("Display stop called")
         self._run = False
