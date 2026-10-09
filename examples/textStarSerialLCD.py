@@ -7,24 +7,27 @@ import subprocess
 
 from time import sleep
 from pigredients.displays import textStarSerialLCD as textStarSerialLCD
+from pigredients.ics import mcp3008 as mcp3008
 
 display = None
+# ADC used by write_distance (an IR distance sensor on channel 0).
+adc_instance = mcp3008.MCP3008()
 
 def write_datetime():
     display.position_cursor(1, 1)
     dt=str(datetime.datetime.now())
-    display.ser.write('   '+dt[:10]+'   '+'    '+dt[11:19]+'    ')
+    display.ser.write(('   '+dt[:10]+'   '+'    '+dt[11:19]+'    ').encode('latin-1'))
 
 def get_addr(interface):
     try:
-        s = subprocess.check_output(["ip","addr","show",interface])
+        s = subprocess.check_output(["ip","addr","show",interface]).decode()
         return s.split('\n')[2].strip().split(' ')[1].split('/')[0]
     except:
         return '?.?.?.?'
 
 def write_ip_addresses():
     display.position_cursor(1, 1)
-    display.ser.write('e'+get_addr('eth0').rjust(15)+'w'+get_addr('wlan0').rjust(15))
+    display.ser.write(('e'+get_addr('eth0').rjust(15)+'w'+get_addr('wlan0').rjust(15)).encode('latin-1'))
 
 def write_distance():
     display.position_cursor(1, 1)
@@ -37,15 +40,15 @@ def write_distance():
     cm = int(round(d))
     val = '%d cm' % cm
     percent = int(cm/1.5)
-    display.ser.write(str(val).ljust(16))
+    display.ser.write((str(val).ljust(16)).encode('latin-1'))
     display.capped_bar(16, percent)
 
 def write_rover_state():
     display.position_cursor(1, 1)
     left_track = random.randrange(0, 100)
     right_track = random.randrange(0, 100)
-    display.ser.write("FL "+chr(254)+"b"+chr(4)+chr(left_track)+" FR "+chr(254)+"b"+chr(4)+chr(right_track)+" ")
-    display.ser.write("RL "+chr(254)+"b"+chr(4)+chr(left_track)+" RR "+chr(254)+"b"+chr(4)+chr(right_track)+" ")
+    display.ser.write(("FL "+chr(254)+"b"+chr(4)+chr(left_track)+" FR "+chr(254)+"b"+chr(4)+chr(right_track)+" ").encode('latin-1'))
+    display.ser.write(("RL "+chr(254)+"b"+chr(4)+chr(left_track)+" RR "+chr(254)+"b"+chr(4)+chr(right_track)+" ").encode('latin-1'))
 
 # Callbacks
 def on_page():
@@ -55,7 +58,7 @@ def on_page():
         write_rover_state()
     elif display.page == 'b':
         write_datetime()
-    elif displayipage == 'c':
+    elif display.page == 'c':
         # IP Page
         write_ip_addresses()
     elif display.page == 'd':
@@ -136,6 +139,15 @@ display.run()
 import serial
 from threading import Thread
 
+def _to_bytes(data):
+    """pyserial on Python 3 requires bytes.  The Textstar protocol uses raw
+    8 bit values (eg. chr(254) escape), so str is encoded as latin-1, which
+    maps code points 0-255 one to one onto bytes."""
+    if isinstance(data, str):
+        return data.encode('latin-1')
+    return bytes(data)
+
+
 class Display():
     """ Manages the 16x2 4 button display:
         on_tick called every 0.1 seconds as part of the main loop after the button read
@@ -165,28 +177,28 @@ class Display():
         self._run = True
 
     def position_cursor(self,line,column):
-        self.ser.write(self.char_esc+'P'+chr(line)+chr(column))
+        self.ser.write(_to_bytes(self.char_esc+'P'+chr(line)+chr(column)))
     
     def scroll_down(self):
-        self.ser.write(self.char_esc+'O'+chr(0))
+        self.ser.write(_to_bytes(self.char_esc+'O'+chr(0)))
     
     def window_home(self):
-        self.ser.write(self.char_esc+'G'+chr(1))
+        self.ser.write(_to_bytes(self.char_esc+'G'+chr(1)))
         
     def capped_bar(self, length, percent):
-        self.ser.write(self.char_esc+'b'+chr(length)+chr(percent))
+        self.ser.write(_to_bytes(self.char_esc+'b'+chr(length)+chr(percent)))
         
     def clear(self):
-        self.ser.write(self.char_clear)
+        self.ser.write(_to_bytes(self.char_clear))
 
     def run(self):
         #show initial page
-        self.ser.write('  Starting....  ')
+        self.ser.write(_to_bytes('  Starting....  '))
         if self.on_page != None:
             self.on_page()
         #main loop
         while self._run:
-            key = str(self.ser.read(1))
+            key = self.ser.read(1).decode('latin-1')
             if key != '' and key in 'abcd':
                 self.page = key
                 self.refresh = self.refresh_max
@@ -214,5 +226,5 @@ class Display():
         self.threaded_runner.start()
 
     def stop(self):
-        print "Display stop called"
+        print("Display stop called")
         self._run = False

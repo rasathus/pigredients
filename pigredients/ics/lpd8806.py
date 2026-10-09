@@ -3,9 +3,9 @@ import time
 import random
 
 # All set commands set the state only, and so require a write command to be displayed.
-		
+        
 class LPD8806_Chain(object):
-	
+    
     def __init__(self, ics_in_chain=32, spi_address_hardware=0, spi_address_output=0):
         # default to 32 ics in the chain, equating to 1 metre
         self.number_of_ics = ics_in_chain
@@ -18,7 +18,7 @@ class LPD8806_Chain(object):
         
         #Write out the current zero'd state to the chain.
         self.write()       
-		
+        
     def write(self):
         # Iterate through our IC states, and write out 3 bytes for each, representing <Red Byte><Green Byte><Blue Byte>
         byte_list = []
@@ -40,10 +40,12 @@ class LPD8806_Chain(object):
         return self.write()
 
     def print_ics(self):
-        print self.ics
+        print(self.ics)
                 
-    def set_ic(self, ic_id, rgb_value=[]):
+    def set_ic(self, ic_id, rgb_value=None):
         # Check we've been given a valid rgb_value.
+        if rgb_value is None:
+            rgb_value = []
         if ic_id > self.number_of_ics -1:
             raise Exception("Invalid ic_id : ic_id given is greater than the number number of ics in the chain.")
             
@@ -51,7 +53,7 @@ class LPD8806_Chain(object):
             raise Exception("Invalid rgb_value : %s , for pin : %s, please pass a list containing three state values eg. [255,255,255]" % (rgb_value, ic_id))
        
         try:
-			# Null op to ensure we've been given an integer.
+            # Null op to ensure we've been given an integer.
             int(ic_id)
             self.ics[ic_id]= {'R' : rgb_value[0], 'G' : rgb_value[1], 'B' : rgb_value[2]}
         except ValueError:

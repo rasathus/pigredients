@@ -90,7 +90,7 @@ if __name__ == '__main__':
     try:
         my_register.set_pin(pin_id="Berta", state=LOW)
     except Exception as e:
-        print "Error : %s" % e
+        print("Error : %s" % e)
         
     my_register.all_off()
     time.sleep(0.5)

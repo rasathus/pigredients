@@ -69,7 +69,7 @@ class MPU6050(object):
     def _read_set_write(self, register, bit, val):
         reg_byte = BitSequence(self.i2c.readU8(register))
         reg_byte[bit] = val
-        self.i2c.write8(register, reg_byte)
+        self.i2c.write8(register, int(reg_byte))
     
     def set_clock_source(self, source):
         pass
@@ -78,46 +78,46 @@ class MPU6050(object):
     def set_gyro_range(self, fs_sel):
         # set via 2 bits @ bit 3-4 in gyro_config register.
         reg_byte = BitSequence(self.i2c.readU8(_mpu6050_ra_gyro_config))
-        print "Before Byte : %s" % reg_byte
+        print("Before Byte : %s" % reg_byte)
         fs_sel_code = BitSequence(fs_sel)
         for bit in fs_sel_code:
             reg_byte[bit+3] = fs_sel_code[bit]
-        print "After Byte : %s" % reg_byte
-        self.i2c.write8(_mpu6050_ra_gyro_config, reg_byte)
+        print("After Byte : %s" % reg_byte)
+        self.i2c.write8(_mpu6050_ra_gyro_config, int(reg_byte))
         
     def set_accel_range(self, afs_sel):
         # set via 2 bits @ bit 3-4 in gyro_config register.
         reg_byte = BitSequence(self.i2c.readU8(_mpu6050_ra_accel_config))
-        print "Before Byte : %s" % reg_byte
+        print("Before Byte : %s" % reg_byte)
         afs_sel_code = BitSequence(afs_sel)
         for bit in afs_sel_code:
             reg_byte[bit+3] = afs_sel_code[bit]
-        print "After Byte : %s" % reg_byte
-        self.i2c.write8(_mpu6050_ra_accel_config, reg_byte)  
+        print("After Byte : %s" % reg_byte)
+        self.i2c.write8(_mpu6050_ra_accel_config, int(reg_byte))  
  
     def set_filtering(self, dlpf_cfg):
         # set via first 3 bits in config register.
         reg_byte = BitSequence(self.i2c.readU8(_mpu6050_config))
-        print "Before Byte : %s" % reg_byte
+        print("Before Byte : %s" % reg_byte)
         dlpf_code = BitSequence(dlpf_cfg)
         for bit in dlpf_code:
             reg_byte[bit] = dlpf_code[bit]
-        print "After Byte : %s" % reg_byte
-        self.i2c.write8(_mpu6050_config, reg_byte)
+        print("After Byte : %s" % reg_byte)
+        self.i2c.write8(_mpu6050_config, int(reg_byte))
     
     def sleep_mode(self, mode):
         reg_byte = BitSequence(self.i2c.readU8(_mpu6050_ra_pwr_mgmt_1))
-        print "Before Byte : %s" % reg_byte
+        print("Before Byte : %s" % reg_byte)
         reg_byte[_mpu6050_pwr1_sleep_bit] = mode
-        print "After Byte : %s" % reg_byte
-        self.i2c.write8(_mpu6050_ra_pwr_mgmt_1, reg_byte)
+        print("After Byte : %s" % reg_byte)
+        self.i2c.write8(_mpu6050_ra_pwr_mgmt_1, int(reg_byte))
 
     def reset(self):
         reg_byte = BitSequence(self.i2c.readU8(_mpu6050_ra_pwr_mgmt_1))
-        print "Before Byte : %s" % reg_byte
+        print("Before Byte : %s" % reg_byte)
         reg_byte[_mpu6050_pwr1_device_reset_bit] = True
-        print "After Byte : %s" % reg_byte
-        self.i2c.write8(_mpu6050_ra_pwr_mgmt_1, reg_byte)
+        print("After Byte : %s" % reg_byte)
+        self.i2c.write8(_mpu6050_ra_pwr_mgmt_1, int(reg_byte))
         
 
 

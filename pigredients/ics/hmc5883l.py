@@ -104,24 +104,24 @@ class HMC5883L(object):
     def get_heading(self):
         scaled_data = self.get_value()
         heading = math.atan2(scaled_data['y'], scaled_data['x'])
-        print "--Begining of Reading--"
-        print "Heading pre correction : %f" % heading
-        print "Heading Degrees pre correction : %f" % math.degrees(heading)
+        print("--Begining of Reading--")
+        print("Heading pre correction : %f" % heading)
+        print("Heading Degrees pre correction : %f" % math.degrees(heading))
         
         heading += self.declination_angle;
 
 
 
 
-        print "Pre-corrected heading %s" % heading
+        print("Pre-corrected heading %s" % heading)
         if heading < 0 :
             heading = heading + 2 * math.pi
         elif heading > 2 * math.pi:
             heading = heading - 2 * math.pi
 
-        print "X Value : %f" % scaled_data['x']
-        print "Y Value : %f" % scaled_data['y']        
-        print "Radians : %f" % heading
-        print "Degrees : %f" % math.degrees(heading)
-        print "--End of Reading--"
+        print("X Value : %f" % scaled_data['x'])
+        print("Y Value : %f" % scaled_data['y']        )
+        print("Radians : %f" % heading)
+        print("Degrees : %f" % math.degrees(heading))
+        print("--End of Reading--")
         return math.degrees(heading)

@@ -5,7 +5,7 @@ from pigredients.ics import hmc5883l as hmc5883l
 compass = hmc5883l.HMC5883L(debug=False)
 
 def write_direction():
-    print "%s" % compass.get_value()
+    print("%s" % compass.get_value())
     #display.ser.write(str(direction).ljust(16))
     
 while True:

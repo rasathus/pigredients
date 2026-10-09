@@ -27,9 +27,15 @@ We have layed out the repository in the following structure ...
         
 To install pigredients for use in other projects, simply run the following command.  Depending on your environment you may not require the sudo prefix to this command.
 
-    sudo python setup.py install
+    pip install git+https://github.com/rasathus/pigredients.git
 
-Additionally some modules require the Adafruit I2C module, which can be found here ... https://github.com/adafruit/Adafruit-Raspberry-Pi-Python-Code
+or, from a checkout of this repository ...
+
+    pip install .
+
+**Requirements:** Python 3.9+.  The `spidev` package is installed automatically.  Modules that use other buses need extra packages: the serial display needs `pyserial` (`pip install "pigredients[serial] @ git+https://github.com/rasathus/pigredients.git"`), and the I2C modules (`mpu6050`, `hmc5883l`) need `smbus` (or `smbus2`, which provides a drop-in `SMBus`; note the imports currently reference `smbus`).
+
+Additionally some modules (`mpu6050`, `hmc5883l`) require the Adafruit I2C module (`Adafruit_I2C`, which is not on PyPI and may need porting to Python 3 separately), which can be found here ... https://github.com/adafruit/Adafruit-Raspberry-Pi-Python-Code
     
 ## Naming Convention Notes
 

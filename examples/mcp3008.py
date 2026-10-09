@@ -19,9 +19,9 @@ def write_pots():
     display.position_cursor(1, 1)
     val = adc_instance.read_input(2)
     percent = int(val/10.23)
-    display.ser.write(str(val).ljust(16))
+    display.ser.write(str(val).ljust(16).encode('latin-1'))
     display.capped_bar(16, percent)
-    print "Current Pin 0 Val : %d " % val
+    print("Current Pin 0 Val : %d " % val)
 
 # Callbacks
 def on_page():

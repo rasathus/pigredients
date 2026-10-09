@@ -5,7 +5,7 @@ from pigredients.ics import mpu6050 as mpu6050
 accel_gyro = mpu6050.MPU6050(debug=False)
 
 def get_accel():
-    print "%s" % accel_gyro.get_accel()
+    print("%s" % accel_gyro.get_accel())
 
 while True:
     get_accel()

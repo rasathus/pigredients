@@ -46,7 +46,7 @@ class Shift_Register(object):
         return self.write()
 
     def print_pins(self):
-        print self.pins
+        print(self.pins)
         
     def set_pin(self, pin_id, state=None,):
         # Check we've been given a valid state.
